@@ -63,6 +63,7 @@ build:android:
 release:
   stage: release
   image: alpine:3.19
+  needs: [build:android]
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
   before_script:
