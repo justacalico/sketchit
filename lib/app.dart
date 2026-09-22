@@ -17,7 +17,7 @@ class SketchitApp extends StatelessWidget {
       animation: settings,
       builder: (context, _) {
         return MaterialApp(
-          title: 'Sketchit',
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
           debugShowCheckedModeBanner: false,
           themeMode: settings.themeMode,
           locale: settings.locale,
