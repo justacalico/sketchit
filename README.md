@@ -1,17 +1,27 @@
-# sketchit
+# Sketchit
 
-A new Flutter project.
+A hand-drawn style whiteboard built with Flutter, running on Android, iOS, Linux, macOS, Windows and the web.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Rectangle, diamond, ellipse, line, arrow, freehand and text elements
+- Sketchy, seeded stroke rendering with three sloppiness levels
+- Selection with move, resize, rotate, layer ordering and duplication
+- Undo/redo, marquee select, keyboard shortcuts
+- Infinite canvas with pinch, wheel and middle-mouse pan/zoom
+- Grid toggle, dark mode, stroke/fill colors, stroke styles, opacity
+- PNG and JSON scene export, JSON scene import, local autosave
+- Fully localized: English, 中文, Español, Français, Deutsch, 日本語, Português, Русский, العربية, 한국어
 
-A few resources to get you started if this is your first Flutter project:
+## Development
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```sh
+flutter pub get
+flutter run          # any connected device
+flutter test         # unit + widget tests
+flutter build web    # web build (deployed to GitLab Pages from main)
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## CI
+
+GitLab CI runs `flutter analyze` and `flutter test --coverage` on every push and merge request, builds the web app to GitLab Pages on main, and produces a release APK for `v*` tags.
