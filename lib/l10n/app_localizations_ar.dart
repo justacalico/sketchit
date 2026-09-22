@@ -162,6 +162,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actionSelectAll => 'تحديد الكل';
 
   @override
+  String get actionCopy => 'نسخ';
+
+  @override
+  String get actionPaste => 'لصق';
+
+  @override
+  String get actionCut => 'قص';
+
+  @override
   String get textPlaceholder => 'اكتب شيئاً';
 
   @override

@@ -162,6 +162,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionSelectAll => '全选';
 
   @override
+  String get actionCopy => '复制';
+
+  @override
+  String get actionPaste => '粘贴';
+
+  @override
+  String get actionCut => '剪切';
+
+  @override
   String get textPlaceholder => '输入文本';
 
   @override

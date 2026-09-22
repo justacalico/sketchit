@@ -162,6 +162,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get actionSelectAll => '모두 선택';
 
   @override
+  String get actionCopy => '복사';
+
+  @override
+  String get actionPaste => '붙여넣기';
+
+  @override
+  String get actionCut => '잘라내기';
+
+  @override
   String get textPlaceholder => '내용을 입력하세요';
 
   @override

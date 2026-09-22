@@ -8,9 +8,18 @@ import 'color_swatch.dart';
 /// Left-hand panel with stroke/fill/width/style/opacity/layer controls.
 /// Visible while a drawing tool is active or a selection exists.
 class PropertiesPanel extends StatelessWidget {
-  const PropertiesPanel({super.key, required this.controller});
+  const PropertiesPanel({
+    super.key,
+    required this.controller,
+    this.onCopy,
+    this.onCut,
+    this.onPaste,
+  });
 
   final DrawingController controller;
+  final VoidCallback? onCopy;
+  final VoidCallback? onCut;
+  final VoidCallback? onPaste;
 
   bool get _visible {
     if (controller.hasSelection) return true;
@@ -178,7 +187,14 @@ class PropertiesPanel extends StatelessWidget {
                 Wrap(
                   spacing: 4,
                   children: [
-                    _layerButton(l10n.actionDuplicate, Icons.copy_outlined,
+                    _layerButton(l10n.actionCopy, Icons.copy_outlined,
+                        () => onCopy?.call(), scheme),
+                    _layerButton(l10n.actionCut, Icons.content_cut_outlined,
+                        () => onCut?.call(), scheme),
+                    _layerButton(l10n.actionPaste,
+                        Icons.content_paste_outlined, () => onPaste?.call(),
+                        scheme),
+                    _layerButton(l10n.actionDuplicate, Icons.copy_all_outlined,
                         c.duplicateSelected, scheme),
                     _layerButton(l10n.actionDelete, Icons.delete_outline,
                         c.deleteSelected, scheme),

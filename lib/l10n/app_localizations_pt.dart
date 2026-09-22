@@ -162,6 +162,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get actionSelectAll => 'Selecionar tudo';
 
   @override
+  String get actionCopy => 'Copiar';
+
+  @override
+  String get actionPaste => 'Colar';
+
+  @override
+  String get actionCut => 'Recortar';
+
+  @override
   String get textPlaceholder => 'Digite algo';
 
   @override

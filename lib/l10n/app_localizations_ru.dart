@@ -162,6 +162,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get actionSelectAll => 'Выбрать всё';
 
   @override
+  String get actionCopy => 'Копировать';
+
+  @override
+  String get actionPaste => 'Вставить';
+
+  @override
+  String get actionCut => 'Вырезать';
+
+  @override
   String get textPlaceholder => 'Введите текст';
 
   @override
