@@ -18,7 +18,7 @@ Future<String?> pickSceneText() {
     }
     final reader = web.FileReader();
     reader.onload = (web.Event _) {
-      completer.complete(reader.result as String?);
+      completer.complete((reader.result as JSString?)?.toDart);
     }.toJS;
     reader.onerror = (web.Event _) {
       completer.complete(null);
