@@ -162,6 +162,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get actionSelectAll => 'すべて選択';
 
   @override
+  String get actionCopy => 'コピー';
+
+  @override
+  String get actionPaste => '貼り付け';
+
+  @override
+  String get actionCut => '切り取り';
+
+  @override
   String get textPlaceholder => 'テキストを入力';
 
   @override

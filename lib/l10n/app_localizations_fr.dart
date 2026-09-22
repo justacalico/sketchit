@@ -162,6 +162,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionSelectAll => 'Tout sélectionner';
 
   @override
+  String get actionCopy => 'Copier';
+
+  @override
+  String get actionPaste => 'Coller';
+
+  @override
+  String get actionCut => 'Couper';
+
+  @override
   String get textPlaceholder => 'Écris quelque chose';
 
   @override

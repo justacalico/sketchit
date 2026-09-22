@@ -162,6 +162,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get actionSelectAll => 'Seleccionar todo';
 
   @override
+  String get actionCopy => 'Copiar';
+
+  @override
+  String get actionPaste => 'Pegar';
+
+  @override
+  String get actionCut => 'Cortar';
+
+  @override
   String get textPlaceholder => 'Escribe algo';
 
   @override

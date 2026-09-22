@@ -485,6 +485,44 @@ class DrawingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Serializes the selection for the clipboard. Returns null when empty.
+  String? copySelectedJson() {
+    final sel = selectedElements;
+    if (sel.isEmpty) return null;
+    return SceneData(elements: sel).encode();
+  }
+
+  String? cutSelectedJson() {
+    final json = copySelectedJson();
+    if (json != null) deleteSelected();
+    return json;
+  }
+
+  /// Pastes clipboard JSON. Returns false when [json] is not a scene.
+  bool pasteJson(String json) {
+    try {
+      final scene = SceneData.decode(json);
+      if (scene.elements.isEmpty) return false;
+      _commit();
+      final pasted = <SketchElement>[];
+      for (final e in scene.elements) {
+        final j = e.toJson()
+          ..['id'] = nextElementId()
+          ..['seed'] = nextSeed();
+        pasted.add(
+            SketchElement.fromJson(j).movedBy(const Offset(24, 24)));
+      }
+      _elements = [..._elements, ...pasted];
+      _selectedIds
+        ..clear()
+        ..addAll(pasted.map((e) => e.id));
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   void reorderSelected(LayerOp op) {
     if (_selectedIds.isEmpty) return;
     _commit();

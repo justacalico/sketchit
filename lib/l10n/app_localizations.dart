@@ -420,6 +420,24 @@ abstract class AppLocalizations {
   /// **'Select all'**
   String get actionSelectAll;
 
+  /// No description provided for @actionCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get actionCopy;
+
+  /// No description provided for @actionPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get actionPaste;
+
+  /// No description provided for @actionCut.
+  ///
+  /// In en, this message translates to:
+  /// **'Cut'**
+  String get actionCut;
+
   /// No description provided for @textPlaceholder.
   ///
   /// In en, this message translates to:

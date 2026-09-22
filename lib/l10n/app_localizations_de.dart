@@ -162,6 +162,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get actionSelectAll => 'Alles auswählen';
 
   @override
+  String get actionCopy => 'Kopieren';
+
+  @override
+  String get actionPaste => 'Einfügen';
+
+  @override
+  String get actionCut => 'Ausschneiden';
+
+  @override
   String get textPlaceholder => 'Text eingeben';
 
   @override

@@ -211,6 +211,29 @@ void main() {
       expect(other.elements.first, c.elements.first);
     });
 
+    test('clipboard round trip creates new ids', () {
+      final c = DrawingController(elements: [box()]);
+      c.selectAll();
+      final json = c.copySelectedJson();
+      expect(json, isNotNull);
+      expect(c.pasteJson(json!), isTrue);
+      expect(c.elements.length, 2);
+      expect(c.elements[1].id, isNot(c.elements[0].id));
+    });
+
+    test('pasteJson rejects garbage', () {
+      final c = DrawingController();
+      expect(c.pasteJson('not json'), isFalse);
+      expect(c.elements, isEmpty);
+    });
+
+    test('cutSelectedJson removes the selection', () {
+      final c = DrawingController(elements: [box()]);
+      c.selectAll();
+      expect(c.cutSelectedJson(), isNotNull);
+      expect(c.elements, isEmpty);
+    });
+
     test('loadScene preserves grid flag', () {
       final c = DrawingController();
       c.loadScene(const SceneData(elements: [], gridEnabled: true));

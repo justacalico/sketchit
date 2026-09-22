@@ -155,6 +155,12 @@ class _WhiteboardScreenState extends State<WhiteboardScreen> {
             _controller.selectAll,
         const SingleActivator(LogicalKeyboardKey.keyD, control: true):
             _controller.duplicateSelected,
+        const SingleActivator(LogicalKeyboardKey.keyC, control: true):
+            _copySelection,
+        const SingleActivator(LogicalKeyboardKey.keyX, control: true):
+            _cutSelection,
+        const SingleActivator(LogicalKeyboardKey.keyV, control: true): () =>
+            unawaited(_pasteClipboard()),
         const SingleActivator(LogicalKeyboardKey.keyS, control: true): () =>
             unawaited(_saveScene()),
         const SingleActivator(LogicalKeyboardKey.keyO, control: true): () =>
@@ -180,6 +186,26 @@ class _WhiteboardScreenState extends State<WhiteboardScreen> {
         const SingleActivator(LogicalKeyboardKey.digit1, shift: true): () =>
             _controller.zoomToFit(MediaQuery.sizeOf(context)),
       };
+
+  void _copySelection() {
+    final json = _controller.copySelectedJson();
+    if (json != null) {
+      Clipboard.setData(ClipboardData(text: json));
+    }
+  }
+
+  void _cutSelection() {
+    final json = _controller.cutSelectedJson();
+    if (json != null) {
+      Clipboard.setData(ClipboardData(text: json));
+    }
+  }
+
+  Future<void> _pasteClipboard() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text;
+    if (text != null) _controller.pasteJson(text);
+  }
 
   void _nudge(Offset delta) {
     if (!_controller.hasSelection) return;
@@ -227,7 +253,14 @@ class _WhiteboardScreenState extends State<WhiteboardScreen> {
                   Positioned(
                     left: 12,
                     top: 12,
-                    child: SafeArea(child: PropertiesPanel(controller: _controller)),
+                    child: SafeArea(
+                      child: PropertiesPanel(
+                        controller: _controller,
+                        onCopy: _copySelection,
+                        onCut: _cutSelection,
+                        onPaste: () => unawaited(_pasteClipboard()),
+                      ),
+                    ),
                   ),
                   Positioned(
                     top: 12,
