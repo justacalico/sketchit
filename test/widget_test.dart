@@ -1,30 +1,48 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sketchit/app.dart';
+import 'package:sketchit/state/settings_controller.dart';
 
-import 'package:sketchit/main.dart';
+Future<SettingsController> testSettings() async {
+  SharedPreferences.setMockInitialValues({});
+  return SettingsController.load();
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('app renders toolbar, menu and canvas hint', (tester) async {
+    final settings = await testSettings();
+    await tester.pumpWidget(SketchitApp(settings: settings));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Sketchit'), findsNothing); // no app bar, hint instead
+    expect(find.byIcon(Icons.rectangle_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.gesture), findsOneWidget);
+    expect(find.byIcon(Icons.menu), findsOneWidget);
+    expect(find.text('Pick a tool and start sketching'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('menu opens with file actions', (tester) async {
+    final settings = await testSettings();
+    await tester.pumpWidget(SketchitApp(settings: settings));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    expect(find.text('Open file'), findsOneWidget);
+    expect(find.text('Export PNG'), findsOneWidget);
+    expect(find.text('Clear canvas'), findsOneWidget);
+  });
+
+  testWidgets('tool buttons switch the active tool', (tester) async {
+    final settings = await testSettings();
+    await tester.pumpWidget(SketchitApp(settings: settings));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.rectangle_outlined));
+    await tester.pumpAndSettle();
+    // Properties panel appears once a drawing tool is active.
+    expect(find.text('Stroke'), findsOneWidget);
+    expect(find.text('Fill'), findsOneWidget);
   });
 }
