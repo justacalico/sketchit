@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.1.1 - 2026-09-23
+#### Bug Fixes
+- release 任务缺少 bash - (d2efb1a) - HttpAnimations
+
+- - -
+
 ## v0.1.0 - 2026-09-23
 #### Features
 - 加上 cocogitto 自动发版和 release 流水线 - (6cb0991) - HttpAnimations
