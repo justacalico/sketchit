@@ -70,6 +70,9 @@ release:
     - apk add --no-cache bash curl tar git
     - bash scripts/install-glab.sh
   script:
+    # The uploads endpoint does not take CI job tokens; use the project
+    # access token instead.
+    - echo "$GITLAB_TOKEN" | glab auth login --hostname gitlab.com --stdin
     - glab release create "$CI_COMMIT_TAG" --name "$CI_COMMIT_TAG" --notes-file CHANGELOG.md ./sketchit.apk || glab release create "$CI_COMMIT_TAG" --name "$CI_COMMIT_TAG" ./sketchit.apk
 
 # Watches pushes to main and lets cocogitto cut a version bump + tag when
