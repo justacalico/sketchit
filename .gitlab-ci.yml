@@ -1,93 +1,127 @@
 spec:
   inputs:
-    build_android:
+    build_all:
+      type: boolean
+      default: true
+      description: 'Build all targets on GitHub (android, linux, linux-arm64, windows, windows-arm64, macos, ios, web)'
+    create_release:
       type: boolean
       default: false
-      description: 'Also build an Android APK artifact'
+      description: 'Create a versioned release'
 ---
 
-default:
-  tags: [linux-truenas]
-
 stages:
-  - build
+  - sync
   - release
 
 variables:
   GLAB_ENABLE_CI_AUTOLOGIN: "true"
   GLAB_VERSION: "1.113.0"
-  GIT_DEPTH: "1"
+  GIT_DEPTH: "0"
   GIT_STRATEGY: "fetch"
+  GIT_CLEAN_FLAGS: "-ffdx"
 
-test:
-  stage: build
-  image: ghcr.io/cirruslabs/flutter:stable
-  script:
-    - flutter pub get
-    - flutter analyze
-    - flutter test --coverage
-  artifacts:
-    when: always
-    paths:
-      - coverage/lcov.info
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+.github-common: &github-common
+  tags: [linux-truenas]
+  image: alpine:3.19
+  before_script:
+    - apk add --no-cache bash curl jq git github-cli openssh-client
+    - sh scripts/setup-ssh-key.sh GITHUB_SSH_PRIVATE_KEY github.com
 
-pages:
-  stage: build
-  image: ghcr.io/cirruslabs/flutter:stable
-  script:
-    # Pages unique domains serve the site at /, not /$CI_PROJECT_NAME/.
-    - flutter build web --release --base-href "/"
-    - mv build/web public
-  artifacts:
-    paths:
-      - public
+# Push every branch/tag update to the GitHub mirror, then watch the
+# GitHub Actions run so a failed GitHub build fails this pipeline.
+github-sync:
+  stage: sync
+  <<: *github-common
+  timeout: 3h
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-build:android:
-  stage: build
-  image: ghcr.io/cirruslabs/flutter:stable
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG
   script:
-    - flutter build apk --release
-    - mv build/app/outputs/flutter-apk/app-release.apk sketchit.apk
-  artifacts:
-    paths:
-      - sketchit.apk
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "web" && $[[ inputs.build_android ]]
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
+    - git remote add github git@github.com:justacalico/sketchit.git || true
+    - git remote update github
+    - |
+      if [ -n "${CI_COMMIT_TAG:-}" ]; then
+        LOCAL_SHA=$(git rev-parse "$CI_COMMIT_TAG")
+        REMOTE_SHA=$(git ls-remote --tags github "refs/tags/$CI_COMMIT_TAG" | awk '{print $1}' | head -n1)
+        # Only a real push triggers a fresh run; an already-mirrored tag
+        # legitimately reuses the run that already exists for its commit.
+        SINCE=""
+        if [ -n "$REMOTE_SHA" ] && [ "$REMOTE_SHA" = "$LOCAL_SHA" ]; then
+          echo "Tag $CI_COMMIT_TAG already mirrored to GitHub at $REMOTE_SHA, skipping"
+        else
+          SINCE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          git push -f github "$CI_COMMIT_TAG"
+        fi
+        # v* tags trigger the release build on GitHub; watch it so a failed
+        # release build fails this pipeline.
+        if echo "$CI_COMMIT_TAG" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+          SHA=$(git rev-parse "$CI_COMMIT_TAG^{commit}")
+          RUN_ID=$(bash scripts/watch-github-run.sh find --sha "$SHA" --event push ${SINCE:+--since "$SINCE"} || true)
+          if [ -z "$RUN_ID" ]; then
+            echo "No GitHub run found for tag $CI_COMMIT_TAG" >&2
+            exit 1
+          fi
+          bash scripts/watch-github-run.sh "$RUN_ID"
+        fi
+      else
+        SHA=$(git rev-parse HEAD)
+        # A push that transfers nothing triggers no new run; only gate on
+        # the trigger time when the ref actually moved.
+        REMOTE_MAIN=$(git ls-remote github refs/heads/main | awk '{print $1}')
+        SINCE=""
+        if [ "$REMOTE_MAIN" != "$SHA" ]; then
+          SINCE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+        fi
+        git push github HEAD:main
+        # Watch the GitHub build for the pushed commit so a failed job on
+        # GitHub also fails this pipeline.
+        RUN_ID=$(bash scripts/watch-github-run.sh find --sha "$SHA" --event push --branch main ${SINCE:+--since "$SINCE"} || true)
+        if [ -z "$RUN_ID" ]; then
+          echo "No GitHub run found for pushed commit $SHA" >&2
+          exit 1
+        fi
+        bash scripts/watch-github-run.sh "$RUN_ID"
+      fi
 
-release:
-  stage: release
-  image: alpine:3.19
-  needs: [build:android]
+github-dispatch:
+  stage: sync
+  <<: *github-common
+  timeout: 3h
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
-  before_script:
-    - apk add --no-cache bash curl tar git
-    - bash scripts/install-glab.sh
+    - if: $CI_PIPELINE_SOURCE == "web"
   script:
-    # The uploads endpoint does not take CI job tokens; use the project
-    # access token instead.
-    - echo "$GITLAB_TOKEN" | glab auth login --hostname gitlab.com --stdin
-    - glab release create "$CI_COMMIT_TAG" --name "$CI_COMMIT_TAG" --notes-file CHANGELOG.md ./sketchit.apk || glab release create "$CI_COMMIT_TAG" --name "$CI_COMMIT_TAG" ./sketchit.apk
+    - |
+      BUILD_ALL="$[[ inputs.build_all ]]"
+      CREATE_RELEASE="$[[ inputs.create_release ]]"
+      if [ "$CREATE_RELEASE" = "true" ]; then
+        BUILD_ALL="true"
+      fi
+      bash scripts/trigger-github-build.sh main "$BUILD_ALL" "$CREATE_RELEASE"
 
-# Watches pushes to main and lets cocogitto cut a version bump + tag when
-# conventional commits warrant one. The tag push starts the tag pipeline
-# that builds assets and publishes the release.
+github-mr-build:
+  stage: sync
+  <<: *github-common
+  timeout: 3h
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - bash scripts/trigger-github-build.sh "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" true false "$CI_COMMIT_SHA"
+
+# On each push to main: cog bump --auto decides if commits warrant a
+# release, writes CHANGELOG.md + version commit + tag. Bump commit is
+# pushed with -o ci.skip; the tag push starts the tag pipeline.
 auto-release:
   stage: release
+  tags: [linux-truenas]
   image: alpine:3.19
   resource_group: auto-release
   timeout: 30m
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs: [github-sync]
   variables:
     COCOGITTO_VERSION: "7.0.0"
-    GIT_DEPTH: "0"
   before_script:
     - apk add --no-cache bash curl git
     - curl -fsSL --retry 3 -o /tmp/cog.tar.gz "https://github.com/cocogitto/cocogitto/releases/download/${COCOGITTO_VERSION}/cocogitto-${COCOGITTO_VERSION}-x86_64-unknown-linux-musl.tar.gz"
@@ -99,3 +133,49 @@ auto-release:
     - git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
   script:
     - bash scripts/auto-release.sh
+
+# Fired by GitHub Actions after a release is built (pipeline trigger
+# token). Downloads the GitHub release assets, makes SHA256SUMS, retags
+# to the release commit via the deploy key, and recreates the GitLab
+# release with --use-package-registry so binaries never expire. Then
+# regenerates the AltStore source for versioned releases.
+github-release-sync:
+  stage: release
+  tags: [linux-truenas]
+  image: alpine:3.19
+  resource_group: release-sync
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger"
+    - if: $CI_PIPELINE_SOURCE == "api"
+  before_script:
+    - apk add --no-cache bash curl jq git github-cli openssh-client
+    - bash scripts/install-glab.sh
+    - sh scripts/setup-ssh-key.sh GITLAB_RELEASE_SSH_KEY gitlab.com
+  script:
+    - bash scripts/sync-from-github.sh
+    - bash scripts/update-altstore.sh
+
+# Serves the web build from the synced GitHub release plus the AltStore
+# source. Runs in the release-sync pipeline so the site always matches
+# the newest release.
+pages:
+  stage: release
+  tags: [linux-truenas]
+  image: alpine:3.19
+  needs: [github-release-sync]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger"
+    - if: $CI_PIPELINE_SOURCE == "api"
+  before_script:
+    - apk add --no-cache bash curl tar git github-cli
+  script:
+    - mkdir -p public
+    - gh release download "$RELEASE_TAG" -R justacalico/sketchit -p "sketchit-web.tar.gz" --dir /tmp/web --clobber
+    - tar -xzf /tmp/web/sketchit-web.tar.gz -C public
+    # apps.json may have been committed to main after this pipeline's sha.
+    - git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" || true
+    - git fetch origin main && git checkout origin/main -- altstore || true
+    - cp -r altstore public/
+  artifacts:
+    paths:
+      - public
