@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.3.0 - 2026-09-24
+#### Features
+- 添加自更新的 AltStore 源 - (895fe84) - HttpAnimations
+#### Bug Fixes
+- rpm 打包缺少 License 字段 - (b564b7d) - HttpAnimations
+
+- - -
+
 ## v0.2.0 - 2026-09-24
 #### Features
 - 所有平台统一换成新的手绘风应用图标 - (11ca9d1) - HttpAnimations
