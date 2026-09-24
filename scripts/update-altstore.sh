@@ -62,8 +62,10 @@ new_entry=$(jq -n \
   --arg minos "$min_os" \
   '{version: $version, date: $date, localizedDescription: "Latest Sketchit release.", downloadURL: $url, size: $size, minOSVersion: $minos}')
 
+# unique_by sorts ascending, which would bury the newest entry — filter the
+# old list by version instead so newest stays first.
 versions=$(jq -cn --argjson new "$new_entry" --argjson old "$existing_versions" \
-  '([$new] + $old) | unique_by(.version) | .[0:5]')
+  '([$new] + ($old | map(select(.version != $new.version)))) | .[0:5]')
 
 jq -n --argjson versions "$versions" '{
   name: "Sketchit",
