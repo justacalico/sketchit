@@ -14,19 +14,19 @@
       "category": "utilities",
       "versions": [
         {
+          "version": "0.3.1",
+          "date": "2026-09-24T16:29:40.072Z",
+          "localizedDescription": "Latest Sketchit release.",
+          "downloadURL": "https://gitlab.com/HttpAnimations/sketchit/-/releases/v0.3.1/downloads/sketchit-ios-arm64-unsigned.ipa",
+          "size": 7235585,
+          "minOSVersion": "13.0"
+        },
+        {
           "version": "0.3.0",
           "date": "2026-09-24T15:47:47.600Z",
           "localizedDescription": "Latest Sketchit release.",
           "downloadURL": "https://gitlab.com/HttpAnimations/sketchit/-/releases/v0.3.0/downloads/sketchit-ios-arm64-unsigned.ipa",
           "size": 7235587,
-          "minOSVersion": "13.0"
-        },
-        {
-          "version": "0.3.1",
-          "date": "2026-09-24T16:10:12.269Z",
-          "localizedDescription": "Latest Sketchit release.",
-          "downloadURL": "https://gitlab.com/HttpAnimations/sketchit/-/releases/v0.3.1/downloads/sketchit-ios-arm64-unsigned.ipa",
-          "size": 7235585,
           "minOSVersion": "13.0"
         }
       ]
