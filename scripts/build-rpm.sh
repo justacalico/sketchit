@@ -41,6 +41,7 @@ Name: sketchit
 Version: %{pkg_version}
 Release: %{pkg_release}%{?dist}
 Summary: Hand-drawn style whiteboard for sketching diagrams
+License: LicenseRef-Proprietary
 URL: https://gitlab.com/HttpAnimations/sketchit
 
 # The bundle is already compiled; skip debug packages and buildroot policy
