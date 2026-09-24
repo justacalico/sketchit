@@ -2,6 +2,27 @@
   "name": "Sketchit",
   "identifier": "com.sketchit.source",
   "sourceURL": "https://gitlab.com/HttpAnimations/sketchit/-/raw/main/altstore/apps.json",
-  "apps": [],
+  "apps": [
+    {
+      "name": "Sketchit",
+      "bundleIdentifier": "com.sketchit.sketchit",
+      "developerName": "Sketchit",
+      "subtitle": "Hand-drawn whiteboard",
+      "localizedDescription": "A hand-drawn style whiteboard for sketching diagrams.",
+      "iconURL": "https://gitlab.com/HttpAnimations/sketchit/-/raw/main/assets/icon/icon.png",
+      "tintedIconURL": "https://gitlab.com/HttpAnimations/sketchit/-/raw/main/assets/icon/icon.png",
+      "category": "utilities",
+      "versions": [
+        {
+          "version": "0.3.0",
+          "date": "2026-09-24T15:47:47.600Z",
+          "localizedDescription": "Latest Sketchit release.",
+          "downloadURL": "https://gitlab.com/HttpAnimations/sketchit/-/releases/v0.3.0/downloads/sketchit-ios-arm64-unsigned.ipa",
+          "size": 7235587,
+          "minOSVersion": "13.0"
+        }
+      ]
+    }
+  ],
   "news": []
 }
