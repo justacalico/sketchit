@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.2.0 - 2026-09-24
+#### Features
+- 所有平台统一换成新的手绘风应用图标 - (11ca9d1) - HttpAnimations
+
+- - -
+
 ## v0.1.3 - 2026-09-23
 #### Bug Fixes
 - release 用项目 token 登录 glab 传附件 - (3b05bc6) - HttpAnimations
