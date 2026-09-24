@@ -34,7 +34,7 @@ release_date=$(printf '%s' "$release" | jq -r '.released_at')
 version="${RELEASE_TAG#v}"
 
 # The release links API does not carry file sizes; HEAD the package URL.
-ipa_size=$(curl -fsSLI "$ipa_url" | awk 'tolower($1)=="content-length:"{print $2}' | tr -d '\r' | tail -n1)
+ipa_size=$(curl -fsSLI "$ipa_url" 2>/dev/null | awk 'tolower($1)=="content-length:"{print $2}' | tr -d '\r' | tail -n1 || true)
 ipa_size="${ipa_size:-0}"
 
 min_os=$(awk '/MinimumOSVersion/{found=1} found && /<string>/{gsub(/.*<string>|<\/string>.*/,""); print; exit}' ios/Flutter/AppFrameworkInfo.plist 2>/dev/null || true)
@@ -62,7 +62,7 @@ new_entry=$(jq -n \
   --arg minos "$min_os" \
   '{version: $version, date: $date, localizedDescription: "Latest Sketchit release.", downloadURL: $url, size: $size, minOSVersion: $minos}')
 
-versions=$(jq -c --argjson new "$new_entry" --argjson old "$existing_versions" \
+versions=$(jq -cn --argjson new "$new_entry" --argjson old "$existing_versions" \
   '([$new] + $old) | unique_by(.version) | .[0:5]')
 
 jq -n --argjson versions "$versions" '{
