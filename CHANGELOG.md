@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.3.1 - 2026-09-24
+#### Bug Fixes
+- AltStore 更新脚本 jq 缺少 -n 参数 - (3dec780) - HttpAnimations
+
+- - -
+
 ## v0.3.0 - 2026-09-24
 #### Features
 - 添加自更新的 AltStore 源 - (895fe84) - HttpAnimations
