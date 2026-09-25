@@ -33,7 +33,7 @@ class SketchElement {
     required this.width,
     required this.height,
     this.angle = 0,
-    this.strokeColor = 0xff1e1e1e,
+    this.strokeColor = 0xffffffff,
     this.fillColor,
     this.strokeWidth = 2,
     this.strokeStyle = StrokeStyle.solid,
@@ -49,7 +49,7 @@ class SketchElement {
   factory SketchElement.shape({
     required ElementType type,
     required Rect rect,
-    int strokeColor = 0xff1e1e1e,
+    int strokeColor = 0xffffffff,
     int? fillColor,
     double strokeWidth = 2,
     StrokeStyle strokeStyle = StrokeStyle.solid,
@@ -76,7 +76,7 @@ class SketchElement {
   factory SketchElement.path({
     required ElementType type,
     required List<Offset> scenePoints,
-    int strokeColor = 0xff1e1e1e,
+    int strokeColor = 0xffffffff,
     double strokeWidth = 2,
     StrokeStyle strokeStyle = StrokeStyle.solid,
     RoughStyle roughness = RoughStyle.sketch,
@@ -107,7 +107,7 @@ class SketchElement {
     required String text,
     required double width,
     required double height,
-    int strokeColor = 0xff1e1e1e,
+    int strokeColor = 0xffffffff,
     double fontSize = 20,
     double opacity = 1,
   }) {
@@ -142,7 +142,7 @@ class SketchElement {
       width: (json['width'] as num).toDouble(),
       height: (json['height'] as num).toDouble(),
       angle: (json['angle'] as num?)?.toDouble() ?? 0,
-      strokeColor: (json['strokeColor'] as num?)?.toInt() ?? 0xff1e1e1e,
+      strokeColor: (json['strokeColor'] as num?)?.toInt() ?? 0xffffffff,
       fillColor: (json['fillColor'] as num?)?.toInt(),
       strokeWidth: (json['strokeWidth'] as num?)?.toDouble() ?? 2,
       strokeStyle: StrokeStyle.values

@@ -26,7 +26,7 @@ enum GrabHandle { none, nw, n, ne, e, se, s, sw, w, rotate }
 /// Style applied to newly drawn elements and editable on a selection.
 class ElementStyle {
   const ElementStyle({
-    this.strokeColor = 0xff1e1e1e,
+    this.strokeColor = 0xffffffff,
     this.fillColor,
     this.strokeWidth = 2,
     this.strokeStyle = StrokeStyle.solid,

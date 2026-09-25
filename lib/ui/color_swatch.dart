@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Stroke palette, roughly the Excalidraw defaults.
 const strokePalette = [
+  0xffffffff,
   0xff1e1e1e,
   0xffe03131,
   0xff2f9e44,
@@ -9,7 +10,6 @@ const strokePalette = [
   0xfff08c00,
   0xff9c36b5,
   0xff0c8599,
-  0xffffffff,
 ];
 
 /// Fill palette: pastels that read well under sketchy strokes.
